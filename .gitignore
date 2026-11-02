@@ -2,6 +2,8 @@
 __pycache__/
 .pytest_cache/
 *.py[cod]
+models/*.joblib
+streamlit_app/*.joblib
 .terraform/
 terraform.tfstate*
 *.tfvars

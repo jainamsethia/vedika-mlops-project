@@ -1,6 +1,6 @@
 import streamlit as st
 
-from app.model import load_model
+from model import load_model
 
 
 @st.cache_resource
