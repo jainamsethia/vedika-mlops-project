@@ -42,4 +42,4 @@ jobs:
         run: |
           mkdir -p "$HOME/.kube"
           echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > "$HOME/.kube/config"
-      - run: kubectl -n house-predictor set image deployment/house-predictor-api api=ghcr.io/${{ github.repository }}:${{ github.sha }}
+      - run: kubectl -n house-predictor set image deployment/house-predictor-ui streamlit=ghcr.io/${{ github.repository }}:${{ github.sha }}

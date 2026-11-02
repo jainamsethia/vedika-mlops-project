@@ -7,5 +7,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app ./app
 COPY streamlit_app ./streamlit_app
 RUN python -m app.train
-EXPOSE 8000 8501
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+EXPOSE 8501
+CMD ["streamlit", "run", "streamlit_app/app.py", "--server.address=0.0.0.0", "--server.port=8501"]

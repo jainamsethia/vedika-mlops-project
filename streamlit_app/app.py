@@ -1,13 +1,15 @@
-import os
-
-import requests
 import streamlit as st
 
-API_URL = os.getenv("API_URL", "http://localhost:8000")
+from app.model import load_model
+
+
+@st.cache_resource
+def get_model():
+    return load_model()
 
 st.set_page_config(page_title="House Price Predictor", page_icon="🏠")
 st.title("🏠 House Price Predictor")
-st.caption("Estimate a property's market value using the deployed ML model.")
+st.caption("Estimate a property's market value using the local ML model.")
 
 with st.form("prediction"):
     area = st.number_input("Living area (sq ft)", min_value=100.0, value=1500.0, step=50.0)
@@ -18,17 +20,6 @@ with st.form("prediction"):
     submitted = st.form_submit_button("Predict price")
 
 if submitted:
-    payload = {
-        "area": area,
-        "bedrooms": bedrooms,
-        "bathrooms": bathrooms,
-        "age": age,
-        "distance_to_city": distance,
-    }
-    try:
-        response = requests.post(f"{API_URL}/predict", json=payload, timeout=10)
-        response.raise_for_status()
-        result = response.json()
-        st.success(f"Estimated price: ${result['predicted_price']:,.2f}")
-    except requests.RequestException as error:
-        st.error(f"Prediction service unavailable: {error}")
+    values = [[area, bedrooms, bathrooms, age, distance]]
+    predicted_price = float(get_model().predict(values)[0])
+    st.success(f"Estimated price: ${predicted_price:,.2f}")

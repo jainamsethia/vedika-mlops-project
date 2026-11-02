@@ -1,15 +1,13 @@
 # House Price Prediction MLOps Project
 
-An end-to-end house price prediction system with:
+An end-to-end, self-contained Streamlit house price prediction system with:
 
-- FastAPI prediction API and Prometheus metrics
 - Streamlit user interface
 - Scikit-learn model training
 - Docker image
 - GitHub Actions CI and container publishing
-- Kubernetes deployment with HPA
+- Kubernetes deployment
 - Terraform infrastructure for AWS EKS
-- Prometheus and Grafana monitoring
 
 ## Quick start
 
@@ -18,38 +16,40 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 python -m app.train
-uvicorn app.main:app --reload
-```
-
-In another terminal:
-
-```bash
 streamlit run streamlit_app/app.py
 ```
 
-Open `http://localhost:8501`. The API is available at `http://localhost:8000/docs`.
+Open `http://localhost:8501`. The model runs inside the Streamlit process; no
+separate backend or API URL is required.
+
+## Deploy the Streamlit app
+
+1. Push this repository to GitHub.
+2. On [share.streamlit.io](https://share.streamlit.io), choose **New app**,
+   select this repository and branch, and set the main file to
+   `streamlit_app/app.py`.
+3. Click **Deploy**. The model is trained/loaded inside the Streamlit app.
 
 ## Docker
 
 ```bash
 docker build -t house-predictor:local .
-docker run --rm -p 8000:8000 house-predictor:local
+docker run --rm -p 8501:8501 house-predictor:local
 ```
 
 ## Kubernetes
 
-Build and publish the image, then replace `ghcr.io/your-org/house-predictor:latest`
-in `k8s/api-deployment.yaml`:
+Build and publish the image, then replace
+`ghcr.io/your-org/house-predictor:latest` in
+`k8s/streamlit-deployment.yaml`:
 
 ```bash
 kubectl apply -f k8s/namespace.yaml
-kubectl apply -f k8s/api-deployment.yaml
 kubectl apply -f k8s/streamlit-deployment.yaml
-kubectl apply -f k8s/monitoring.yaml
 ```
 
-The manifests use a `LoadBalancer` service for Streamlit and an internal API
-service. For local clusters, use `minikube tunnel` or `kubectl port-forward`.
+The Streamlit manifest uses a `LoadBalancer` service. For local clusters, use
+`minikube tunnel` or `kubectl port-forward`.
 
 ## AWS infrastructure
 
