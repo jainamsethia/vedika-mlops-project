@@ -1,6 +1,7 @@
 # House Price Prediction MLOps Project
 
-An end-to-end, self-contained Streamlit house price prediction system with:
+An end-to-end, self-contained Streamlit house price prediction system :
+
 
 - Streamlit user interface
 - Scikit-learn model training
