@@ -77,3 +77,4 @@ The included training script creates a deterministic demonstration dataset
 using common housing features. Replace `app/train.py` with your production
 dataset pipeline when real data is available. The API validates inputs with
 Pydantic and exposes `/health`, `/predict`, and `/metrics`.
+
