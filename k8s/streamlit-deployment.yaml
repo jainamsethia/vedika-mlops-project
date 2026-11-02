@@ -14,8 +14,29 @@ spec:
       containers:
         - name: streamlit
           image: ghcr.io/your-org/house-predictor:latest
-          command: ["streamlit", "run", "streamlit_app/app.py", "--server.address=0.0.0.0"]
-          ports: [{containerPort: 8501}]
+          command: ["python", "streamlit_app/launcher.py"]
+          ports:
+            - {name: http, containerPort: 8501}
+            - {name: metrics, containerPort: 8000}   # Prometheus scrapes this port
+          readinessProbe:
+            httpGet:
+              path: /_stcore/health
+              port: 8501
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /_stcore/health
+              port: 8501
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
 ---
 apiVersion: v1
 kind: Service
@@ -25,4 +46,10 @@ metadata:
 spec:
   type: LoadBalancer
   selector: {app: house-predictor-ui}
-  ports: [{port: 80, targetPort: 8501}]
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8501
+    - name: metrics
+      port: 8000
+      targetPort: 8000

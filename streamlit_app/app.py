@@ -1,13 +1,40 @@
+import time
+
 import streamlit as st
 
+from metrics import (
+    MODEL_LOAD_SECONDS,
+    MODEL_LOADED,
+    PREDICTED_PRICE,
+    PREDICTION_ERRORS,
+    PREDICTION_LATENCY,
+    PREDICTIONS,
+    SCRIPT_RUNS,
+    observe_inputs,
+    start_metrics_server,
+)
 from model import load_model
 
 
 @st.cache_resource
 def get_model():
-    return load_model()
+    started = time.perf_counter()
+    model = load_model()
+    MODEL_LOAD_SECONDS.set(time.perf_counter() - started)
+    MODEL_LOADED.set(1)
+    return model
+
+
+@st.cache_resource
+def init_metrics():
+    # Starts the Prometheus /metrics endpoint once per process (default :8000).
+    return start_metrics_server()
+
 
 st.set_page_config(page_title="House Price Predictor", page_icon="🏠")
+init_metrics()
+SCRIPT_RUNS.inc()
+
 st.title("🏠 House Price Predictor")
 st.caption("Estimate a property's market value using the local ML model.")
 
@@ -21,5 +48,15 @@ with st.form("prediction"):
 
 if submitted:
     values = [[area, bedrooms, bathrooms, age, distance]]
-    predicted_price = float(get_model().predict(values)[0])
+    try:
+        model = get_model()
+        started = time.perf_counter()
+        predicted_price = float(model.predict(values)[0])
+        PREDICTION_LATENCY.observe(time.perf_counter() - started)
+    except Exception:
+        PREDICTION_ERRORS.inc()
+        raise
+    PREDICTIONS.inc()
+    PREDICTED_PRICE.observe(predicted_price)
+    observe_inputs(area, bedrooms, bathrooms, age, distance)
     st.success(f"Estimated price: ${predicted_price:,.2f}")

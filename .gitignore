@@ -7,3 +7,5 @@ streamlit_app/*.joblib
 .terraform/
 terraform.tfstate*
 *.tfvars
+.env
+powershell.bat
