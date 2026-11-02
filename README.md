@@ -15,12 +15,11 @@ An end-to-end, self-contained Streamlit house price prediction system with:
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python -m app.train
 streamlit run streamlit_app/app.py
 ```
 
-Open `http://localhost:8501`. The model runs inside the Streamlit process; no
-separate backend or API URL is required.
+Open `http://localhost:8501`. The model trains or loads inside the Streamlit
+process; no separate backend or API URL is required.
 
 ## Deploy the Streamlit app
 
@@ -65,16 +64,15 @@ terraform apply -var='cluster_name=house-predictor'
 
 ## CI/CD
 
-`.github/workflows/ci-cd.yml` runs tests and builds the image on every pull
-request. On pushes to `main`, it publishes the image to GitHub Container
-Registry and updates the Kubernetes deployment. Set repository permissions to
-allow `packages: write` and configure a cluster context secret named
-`KUBE_CONFIG` for deployment.
+`.github/workflows/ci-cd.yml` checks Python syntax and builds the image on every
+pull request. On pushes to `main`, it publishes the image to GitHub Container
+Registry and updates the Streamlit Kubernetes deployment. Set repository
+permissions to allow `packages: write` and configure a cluster context secret
+named `KUBE_CONFIG` for deployment.
 
 ## Model
 
-The included training script creates a deterministic demonstration dataset
-using common housing features. Replace `app/train.py` with your production
-dataset pipeline when real data is available. The API validates inputs with
-Pydantic and exposes `/health`, `/predict`, and `/metrics`.
-
+The included Streamlit model helper creates a deterministic demonstration
+dataset using common housing features. Replace the training logic in
+`streamlit_app/model.py` with your production dataset pipeline when real data
+is available.

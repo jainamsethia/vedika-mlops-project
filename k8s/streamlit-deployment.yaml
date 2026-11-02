@@ -15,9 +15,6 @@ spec:
         - name: streamlit
           image: ghcr.io/your-org/house-predictor:latest
           command: ["streamlit", "run", "streamlit_app/app.py", "--server.address=0.0.0.0"]
-          env:
-            - name: API_URL
-              value: http://house-predictor-api:8000
           ports: [{containerPort: 8501}]
 ---
 apiVersion: v1
